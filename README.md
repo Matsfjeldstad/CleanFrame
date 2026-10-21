@@ -20,7 +20,7 @@ It runs on my Xiaomi TV Stick 4K (Android TV 11). Nothing in it is specific to t
 
 <table>
   <tr>
-    <td><img src="docs/images/android-dock.jpg" alt="Dock layout with logos only"></td>
+    <td><img src="docs/images/android-dock-logos.jpg" alt="Dock layout with logos only"></td>
     <td><img src="docs/images/android-all-apps.jpg" alt="All apps"></td>
   </tr>
   <tr>
