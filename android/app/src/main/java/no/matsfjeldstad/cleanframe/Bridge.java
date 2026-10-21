@@ -11,7 +11,12 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.AdaptiveIconDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkCapabilities;
 import android.net.Uri;
+import android.net.wifi.SupplicantState;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.provider.Settings;
 import android.text.format.DateFormat;
 import android.webkit.JavascriptInterface;
@@ -117,6 +122,25 @@ final class Bridge {
         }
         if (pick == null) return "No other Home app is installed.";
         return start(new Intent(Intent.ACTION_MAIN).setComponent(pick));
+    }
+
+    /**
+     * {"type": "wifi" | "ethernet" | "none", "level": 0-3, "online": validated internet}.
+     * Wi-Fi is read from WifiManager so a VPN on top of it still reports the Wi-Fi signal.
+     */
+    @JavascriptInterface
+    public String network() throws JSONException {
+        ConnectivityManager cm = activity.getSystemService(ConnectivityManager.class);
+        NetworkCapabilities caps = cm.getNetworkCapabilities(cm.getActiveNetwork());
+        WifiInfo wifi = activity.getApplicationContext().getSystemService(WifiManager.class).getConnectionInfo();
+        JSONObject out = new JSONObject().put("type", "none").put("level", 0)
+                .put("online", caps != null && caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED));
+        if (wifi != null && wifi.getSupplicantState() == SupplicantState.COMPLETED) {
+            out.put("type", "wifi").put("level", WifiManager.calculateSignalLevel(wifi.getRssi(), 4));
+        } else if (caps != null && caps.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)) {
+            out.put("type", "ethernet");
+        }
+        return out.toString();
     }
 
     @JavascriptInterface

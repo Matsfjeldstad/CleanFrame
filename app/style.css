@@ -612,3 +612,10 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000}
 .font-manrope *{font-weight:400!important}
 .font-manrope .is-focus,.font-manrope .is-focus *,.font-manrope .is-lifted,.font-manrope .is-lifted *,.font-manrope .util-focus-label.is-on,.font-manrope .app-focus-name{font-weight:600!important}
 .font-manrope .monogram,.font-manrope .monogram *{font-weight:600!important}
+/* Wi-Fi beside the clock; it takes the clock's colour and opacity. */
+.clock .net{width:.88em;height:.7em;margin-left:.36em;vertical-align:0;stroke-width:1.8;filter:drop-shadow(0 1px 2px rgba(0,0,0,.22))}
+.l-list .clock .net{margin:0 .36em 0 0}
+.clock .net circle{fill:currentColor;stroke:none}
+.clock .net .is-dim{opacity:.3}
+.clock .net.is-off{opacity:.6}
+.bg-dark .clock .net,.bg-light .clock .net{filter:none}

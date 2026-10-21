@@ -1084,13 +1084,30 @@
     if (CLOCK24 && h < 10) h = '0' + h;
     return h + ':' + (m < 10 ? '0' : '') + m;
   }
+  /* Wi-Fi beside the clock: arcs light with signal level; a slash when offline. Wired shows nothing. */
+  var NET_MS = 10000, NET_ARCS = ['M8.6 15.6a4.8 4.8 0 0 1 6.8 0', 'M5.4 12.4a9.3 9.3 0 0 1 13.2 0', 'M2.2 9.2a13.8 13.8 0 0 1 19.6 0'];
+  var net = null, netTimer = 0;
+  function netHtml() {
+    if (!net || net.type === 'ethernet') return '';
+    var off = net.type === 'none' || !net.online, lit = off ? 0 : clamp(net.level, 0, 3);
+    return '<svg class="ico net' + (off ? ' is-off' : '') + '" viewBox="1.2 4 21.6 17.2" aria-hidden="true">'
+      + NET_ARCS.map(function (d, i) { return '<path' + (i < lit ? '' : ' class="is-dim"') + ' d="' + d + '"/>'; }).join('')
+      + '<circle cx="12" cy="19.2" r="1.3"/>' + (off ? '<path d="M4 4l16 16"/>' : '') + '</svg>';
+  }
+  function updateNetwork() {
+    clearTimeout(netTimer);
+    if (document.hidden || !FrameDevice.network) return;
+    net = FrameDevice.network();
+    if (top().id === 'home' || isSettingsDetail(top())) renderCaption(top(), homeState(top()));
+    netTimer = setTimeout(updateNetwork, NET_MS);
+  }
   function clockHtml() {
     var text = clockText(), metrics = fontMetrics[homeFont()];
     if (!metrics || !metrics.digitCell) return text;
     return text.replace(/[0-9]/g, function (digit) { return '<span class="clock-digit">' + digit + '</span>'; });
   }
   function renderCaption(t, hs) {
-    var html = '<span class="clock">' + clockHtml() + '</span>';
+    var html = '<span class="clock">' + (S.c.layout === 'list' ? netHtml() + clockHtml() : clockHtml() + netHtml()) + '</span>';
     if (S.c.apps !== 'icons' && hs.items[hs.i] && (S.c.layout === 'list' ? photoLabel(hs.items[hs.i].id, false).size < 88 || photoLabel(hs.items[hs.i].id, false).ellipsis : hs.zone === 'apps' && reducedDockLabel(hs.items[hs.i].id))) html += '<span class="cap-line full-name">' + esc(app(hs.items[hs.i].id).name) + '</span>';
     setHTML(caption, html);
   }
@@ -1881,8 +1898,8 @@
   window.addEventListener('focus', function () { release(); focusStage(); after(); updateClock(); });
   document.addEventListener('visibilitychange', function () {
     heldKeys = {}; cancelHold();
-    if (document.hidden) { pauseRotation(); clearTimeout(clockTimer); }
-    else { release(); after(); updateClock(); focusStage(); }
+    if (document.hidden) { pauseRotation(); clearTimeout(clockTimer); clearTimeout(netTimer); }
+    else { release(); after(); updateClock(); updateNetwork(); focusStage(); }
   });
   window.addEventListener('resize', fit);
 
@@ -1922,5 +1939,5 @@
   setLook({}, { transient: true, startup: true });
   norm(); render(); fit(); focusStage(); updateClock(); syncRotation();
   /* Native marks and icons for Home come from the installed-app list. */
-  if (FrameDevice.native) refreshCatalog();
+  if (FrameDevice.native) { refreshCatalog(); updateNetwork(); }
 })();

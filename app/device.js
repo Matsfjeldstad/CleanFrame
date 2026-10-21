@@ -38,8 +38,12 @@
       }));
     }, 0);
   }
+  /* { type: 'wifi' | 'ethernet' | 'none', level: 0-3, online } */
+  function network() {
+    try { return api() ? JSON.parse(api().network()) : null; } catch (e) { return null; }
+  }
   function clock24() {
     try { return !!(api() && api().is24Hour()); } catch (e) { return false; }
   }
-  window.FrameDevice = { native: !!api(), launchApp: launchApp, art: art, home: home, settings: settings, appInfo: appInfo, apps: apps, clock24: clock24 };
+  window.FrameDevice = { native: !!api(), launchApp: launchApp, art: art, home: home, settings: settings, appInfo: appInfo, apps: apps, network: network, clock24: clock24 };
 }());
