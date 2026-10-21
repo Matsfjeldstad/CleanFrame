@@ -16,5 +16,23 @@
     "source": "https://github.com/simple-icons/simple-icons/blob/develop/icons/tubi.svg",
     "licence": "CC0-1.0",
     "note": "Shape unchanged; white fill for launcher."
+  },
+  {
+    "icon": "f1",
+    "source": "https://github.com/simple-icons/simple-icons/blob/15.22.0/icons/f1.svg",
+    "licence": "CC0-1.0",
+    "note": "Shape unchanged; white fill for launcher."
+  },
+  {
+    "icon": "nordvpn",
+    "source": "https://github.com/simple-icons/simple-icons/blob/15.22.0/icons/nordvpn.svg",
+    "licence": "CC0-1.0",
+    "note": "Shape unchanged; white fill for launcher."
+  },
+  {
+    "icon": "googleplay",
+    "source": "https://github.com/simple-icons/simple-icons/blob/15.22.0/icons/googleplay.svg",
+    "licence": "CC0-1.0",
+    "note": "Shape unchanged; white fill for launcher."
   }
 ]

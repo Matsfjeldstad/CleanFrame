@@ -1,0 +1,43 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'no.matsfjeldstad.cleanframe'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId 'no.matsfjeldstad.cleanframe'
+        minSdk 26
+        targetSdk 30
+        versionCode 1
+        versionName '0.6.1-android.1'
+    }
+
+    // The packaged web UI is the repo's app/ folder, served to the WebView from assets.
+    sourceSets {
+        main {
+            assets.srcDirs = ['../../app']
+        }
+    }
+
+    androidResources {
+        ignoreAssetsPattern '!.*:!*~:!config.xml:!icon.png:!*.md:!SOURCES.json:!ADDITIONAL-SOURCES.json:!*LICENSE*.txt:!OFL.txt'
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+
+    lint {
+        // Sideloaded over ADB, never published to Google Play.
+        disable 'ExpiredTargetSdkVersion'
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
