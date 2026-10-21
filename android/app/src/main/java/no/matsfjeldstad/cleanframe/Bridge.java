@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.AdaptiveIconDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.provider.Settings;
 import android.text.format.DateFormat;
 import android.webkit.JavascriptInterface;
@@ -87,6 +88,12 @@ final class Bridge {
     @JavascriptInterface
     public String settings() {
         return start(new Intent(Settings.ACTION_SETTINGS));
+    }
+
+    /** The system App info screen: force stop, storage, permissions, uninstall. */
+    @JavascriptInterface
+    public String appInfo(String pkg) {
+        return start(new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + pkg)));
     }
 
     @JavascriptInterface

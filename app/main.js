@@ -8,10 +8,11 @@
   var DOCK_MODES = { both: { tw: 288, th: 200, pitch: 296 }, text: { tw: 288, th: 104, pitch: 296 }, icons: { tw: 176, th: 144, pitch: 184 } };
   var GRID_ROW = 240, GRID_COL = 344, COLS = 5;
   var ED_ROW = 80, ED_SEP = 56, ED_VIEW = 752, STRIP_PITCH = 188;
-  var PH_TOP = 220, PH_PITCH = 128, PH_FULL = 5, PH_HEIGHT = 944, PH_COMPACT_TOP = 144, PH_COMPACT_PITCH = 88, PH_COMPACT_VISIBLE = 9;
+  var PH_TOP = 196, PH_PITCH = 144, PH_FULL = 5, PH_HEIGHT = 1008, PH_COMPACT_TOP = 144, PH_COMPACT_PITCH = 88, PH_COMPACT_VISIBLE = 9;
   var WALL_VISIBLE = 6, WALL_ROW = 92, WALL_DELAY = 200;
   var KEYS = { 37: 'left', 38: 'up', 39: 'right', 40: 'down', 13: 'ok', 27: 'back', 8: 'back', 10009: 'back', 461: 'back' };
   var FULL = 'Home holds nine apps. Remove one first.', LAST = 'Home needs one app';
+  var HOLD_MS = 550;
 
   /* Apps with a bundled SVG use its brand id; the rest use the package name and get a mark from the TV. */
   var PRIMARY_APPS = [
@@ -38,7 +39,7 @@
   var KEY = 'cleanframe.home.v1', storageOk = true, catalog = { loading: false, loaded: false, error: null, request: 0, revision: 0 };
   var QA = window.ShoreQA = { minuteMs: window.ShoreQA && window.ShoreQA.minuteMs || 60000 };
   var FONTS = {
-    manrope: { name: 'Manrope', family: 'Manrope', display: 600, ui: 500, clock: 500 },
+    manrope: { name: 'Manrope', family: 'Manrope', display: 600, ui: 600, clock: 400 },
     montreal: { name: 'Neue Montreal', family: 'Study Montreal', display: 300, ui: 400, clock: 300 },
     mori: { name: 'Mori', family: 'Study Mori', display: 200, ui: 400, clock: 200 },
     pangram: { name: 'Pangram Sans', family: 'Study Pangram', display: 300, ui: 400, clock: 300 },
@@ -514,6 +515,18 @@
     push({ id: 'appearance', group: group, f: { action: action } });
   }
   function openMessage(key) { push({ id: 'message', msg: key, f: { b: 0 } }); }
+  /* Holding OK on an app: open it, change Home membership or reach the TV's own app settings. */
+  function openAppMenu(id) {
+    var a = app(id);
+    if (!a) return;
+    push({ id: 'message', msg: 'app', app: id, f: { b: 0 }, content: { title: a.name, line: '', note: '',
+      actions: [['open', 'Open'], ['home', onHome(id) ? 'Remove from Home' : 'Add to Home'], ['info', 'App info']] } });
+  }
+  function appMenuAction(id, action) {
+    if (action === 'open') launch(id);
+    else if (action === 'info') perform('App info', function (done) { FrameDevice.appInfo(app(id).appId, done); });
+    else if (action === 'home' && !(onHome(id) ? homeRemove(id) : homeAdd(id)) && S.note) { message(app(id).name, S.note); S.note = null; }
+  }
   function openApps() {
     var e = { id: 'apps', mode: 'browse', top: 0, f: { zone: 'grid', i: Math.max(0, ALPHA.indexOf(S.appsFocus)), h: 0 } };
     push(e); refreshCatalog(); return e;
@@ -555,6 +568,7 @@
       else if (k === x.prev && i > 0) setSel(h[i - 1]);
       else if (k === x.next && i < h.length - 1) setSel(h[i + 1]);
       else if (k === 'ok') launch(S.sel);
+      else if (k === 'hold') openAppMenu(S.sel);
     },
     point: function (t, z, i) {
       if (z === 'util') { t.f.zone = 'util'; t.f.u = i; S.lastUtil = i; }
@@ -581,6 +595,7 @@
     else if (k === 'down' && i < h.length - 1) setSel(h[i + 1]);
     else if (k === 'back') openMessage('leave');
     else if (k === 'ok') { if (h.length) launch(S.sel); else addAppsRoute(); }
+    else if (k === 'hold' && h.length) openAppMenu(S.sel);
   }
 
   /* ---------- Wallpaper child: focus previews, activation applies ---------- */
@@ -707,6 +722,7 @@
       else if (k === 'down' && row < Math.ceil(n / COLS) - 1) f.i = Math.min(f.i + COLS, n - 1);
       else if (k === 'up') { if (row > 0) f.i -= COLS; else f.zone = 'head'; }
       else if (k === 'ok' && n) launch(items[f.i]);
+      else if (k === 'hold' && n) openAppMenu(items[f.i]);
       S.appsFocus = items[f.i] || null;
     },
     point: function (t, z, i) { if (z === 'grid') { t.f.zone = 'grid'; t.f.i = i; } else if (z === 'head') t.f.zone = 'head'; else return; this.key(t, 'ok'); }
@@ -961,7 +977,11 @@
       if (k === 'left') t.f.b = Math.max(0, t.f.b - 1);
       else if (k === 'right') t.f.b = Math.min(A.length - 1, t.f.b + 1);
       else if (k === 'back') pop();
-      else if (k === 'ok') { a = A[t.f.b][0]; pop(); if (a === 'samsung') perform('Android TV launcher', FrameDevice.home); }
+      else if (k === 'ok') {
+        a = A[t.f.b][0]; pop();
+        if (a === 'samsung') perform('Android TV launcher', FrameDevice.home);
+        else if (t.app) appMenuAction(t.app, a);
+      }
     },
     point: function (t, z, i) { if (z === 'act') { t.f.b = i; this.key(t, 'ok'); } }
   };
@@ -1830,27 +1850,44 @@
     if (!el || el === stage) return;
     pointAt(el);
   });
-  var heldKeys = {};
+  var heldKeys = {}, okHold = null;
+  /* OK on an app waits for release: a short press launches it, holding opens its menu. */
+  function holdTarget() {
+    var t = top();
+    if (t.id === 'home') return t.f.zone !== 'util' && S.c.home.length > 0;
+    return t.id === 'apps' && t.f.zone === 'grid' && appsItems().length > 0;
+  }
+  function cancelHold() { if (okHold) clearTimeout(okHold.timer); okHold = null; }
   document.addEventListener('keydown', function (ev) {
     var code = ev.keyCode, k = KEYS[code];
     if (code === 9) { ev.preventDefault(); return; }
     if (!k || ev.metaKey || ev.ctrlKey || ev.altKey) return;
     ev.preventDefault();
     if (k === 'ok' || k === 'back') { if (ev.repeat || heldKeys[code]) return; heldKeys[code] = true; }
+    if (k === 'ok' && holdTarget()) {
+      cancelHold();
+      okHold = { code: code, timer: setTimeout(function () { okHold.timer = 0; press('hold'); }, HOLD_MS) };
+      return;
+    }
     press(k);
   });
-  document.addEventListener('keyup', function (ev) { delete heldKeys[ev.keyCode]; });
-  window.addEventListener('blur', function () { heldKeys = {}; });
+  document.addEventListener('keyup', function (ev) {
+    delete heldKeys[ev.keyCode];
+    if (!okHold || okHold.code !== ev.keyCode) return;
+    if (okHold.timer) { clearTimeout(okHold.timer); press('ok'); }
+    okHold = null;
+  });
+  window.addEventListener('blur', function () { heldKeys = {}; cancelHold(); });
   window.addEventListener('focus', function () { release(); focusStage(); after(); updateClock(); });
   document.addEventListener('visibilitychange', function () {
-    heldKeys = {};
+    heldKeys = {}; cancelHold();
     if (document.hidden) { pauseRotation(); clearTimeout(clockTimer); }
     else { release(); after(); updateClock(); focusStage(); }
   });
   window.addEventListener('resize', fit);
 
   /* Readable browser checks use the real state and actions, without fake outcomes. */
-  var NAV = { left: 'left', right: 'right', up: 'up', down: 'down', ok: 'ok', enter: 'ok', back: 'back', escape: 'back' };
+  var NAV = { left: 'left', right: 'right', up: 'up', down: 'down', ok: 'ok', enter: 'ok', back: 'back', escape: 'back', hold: 'hold' };
   QA.state = function () {
     var out = serialise(S.c), t = top(), item = t.id === 'appearance' ? detailLocation(t).item : null;
     out.committed = S.c; out.shown = S.shown; out.pending = S.pending; out.view = t.id; out.selected = S.sel;

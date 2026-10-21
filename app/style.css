@@ -166,7 +166,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000}
 .bg-photo.lc-3 .ph-col{background:linear-gradient(to right,rgba(10,8,6,.32) 0,rgba(10,8,6,.32) 600px,rgba(10,8,6,0) 1040px)}
 .ph-scene{position:absolute;left:0;top:0;width:1920px;height:1080px;pointer-events:none}
 .l-list .ph-scene{display:block}
-.ph-list{position:absolute;z-index:2;left:112px;top:72px;width:1200px;height:944px;overflow:hidden;pointer-events:auto;-webkit-mask-image:linear-gradient(to bottom,rgba(0,0,0,0.0000) 0px,rgba(0,0,0,0.0156) 20.5px,rgba(0,0,0,0.0625) 41px,rgba(0,0,0,0.1406) 61.5px,rgba(0,0,0,0.2500) 82px,rgba(0,0,0,0.3906) 102.5px,rgba(0,0,0,0.5625) 123px,rgba(0,0,0,0.7656) 143.5px,rgba(0,0,0,1.0000) 164px,#000 788px,rgba(0,0,0,0.7656) 807.5px,rgba(0,0,0,0.5625) 827px,rgba(0,0,0,0.3906) 846.5px,rgba(0,0,0,0.2500) 866px,rgba(0,0,0,0.1406) 885.5px,rgba(0,0,0,0.0625) 905px,rgba(0,0,0,0.0156) 924.5px,rgba(0,0,0,0.0000) 944px);mask-image:linear-gradient(to bottom,rgba(0,0,0,0.0000) 0px,rgba(0,0,0,0.0156) 20.5px,rgba(0,0,0,0.0625) 41px,rgba(0,0,0,0.1406) 61.5px,rgba(0,0,0,0.2500) 82px,rgba(0,0,0,0.3906) 102.5px,rgba(0,0,0,0.5625) 123px,rgba(0,0,0,0.7656) 143.5px,rgba(0,0,0,1.0000) 164px,#000 788px,rgba(0,0,0,0.7656) 807.5px,rgba(0,0,0,0.5625) 827px,rgba(0,0,0,0.3906) 846.5px,rgba(0,0,0,0.2500) 866px,rgba(0,0,0,0.1406) 885.5px,rgba(0,0,0,0.0625) 905px,rgba(0,0,0,0.0156) 924.5px,rgba(0,0,0,0.0000) 944px)}
+.ph-list{position:absolute;z-index:2;left:112px;top:48px;width:1200px;height:1008px;overflow:hidden;pointer-events:auto;-webkit-mask-image:linear-gradient(to bottom,rgba(0,0,0,0.0000) 0px,rgba(0,0,0,0.0156) 20.5px,rgba(0,0,0,0.0625) 41px,rgba(0,0,0,0.1406) 61.5px,rgba(0,0,0,0.2500) 82px,rgba(0,0,0,0.3906) 102.5px,rgba(0,0,0,0.5625) 123px,rgba(0,0,0,0.7656) 143.5px,rgba(0,0,0,1.0000) 164px,#000 852px,rgba(0,0,0,0.7656) 871.5px,rgba(0,0,0,0.5625) 891px,rgba(0,0,0,0.3906) 910.5px,rgba(0,0,0,0.2500) 930px,rgba(0,0,0,0.1406) 949.5px,rgba(0,0,0,0.0625) 969px,rgba(0,0,0,0.0156) 988.5px,rgba(0,0,0,0.0000) 1008px);mask-image:linear-gradient(to bottom,rgba(0,0,0,0.0000) 0px,rgba(0,0,0,0.0156) 20.5px,rgba(0,0,0,0.0625) 41px,rgba(0,0,0,0.1406) 61.5px,rgba(0,0,0,0.2500) 82px,rgba(0,0,0,0.3906) 102.5px,rgba(0,0,0,0.5625) 123px,rgba(0,0,0,0.7656) 143.5px,rgba(0,0,0,1.0000) 164px,#000 852px,rgba(0,0,0,0.7656) 871.5px,rgba(0,0,0,0.5625) 891px,rgba(0,0,0,0.3906) 910.5px,rgba(0,0,0,0.2500) 930px,rgba(0,0,0,0.1406) 949.5px,rgba(0,0,0,0.0625) 969px,rgba(0,0,0,0.0156) 988.5px,rgba(0,0,0,0.0000) 1008px)}
 .ph-rows{position:absolute;left:0;top:0;width:1200px;transition:transform var(--t) var(--ease);will-change:transform}
 .ph-row{position:absolute;left:0;top:0;width:1200px;height:128px;transition:transform var(--t) var(--ease)}
 .ph-group{position:absolute;left:0;top:0;width:100%;height:100%;opacity:.8;transform-origin:28px 64px;transition:opacity 160ms linear,transform var(--t) var(--ease)}
@@ -597,3 +597,18 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000}
 .is-font-switch .home .ph-name,.is-font-switch .home .clock,.is-font-switch .home .tile .label,.is-font-switch .home .u-label,.is-font-switch .home .app-focus-name,.is-font-switch .home .util-focus-label{animation:font-in 160ms linear}
 @keyframes font-in{from{opacity:0}}
 @media(prefers-reduced-motion:reduce){.is-font-switch .home .ph-name,.is-font-switch .home .clock,.is-font-switch .home .tile .label,.is-font-switch .home .u-label,.is-font-switch .home .app-focus-name,.is-font-switch .home .util-focus-label{animation-duration:120ms}}
+/* Android fork: unfocused apps step well back so focus reads at a glance. */
+.stage{--app-peer:.5;--app-sel:.72}
+.tile .mark,.tile .label{opacity:var(--app-peer)}
+.f-type .tile-content,.bg-photo.f-type .tile-content{opacity:var(--app-peer)}
+.f-type .tile.is-sel .tile-content,.bg-photo.f-type .tile.is-sel .tile-content{opacity:var(--app-sel)}
+.ph-group,.f-type .ph-group,.bg-photo .ph-group,.bg-photo.f-type .ph-group{opacity:var(--app-peer)}
+.f-type .ph-row.is-sel .ph-group,.bg-photo.f-type .ph-row.is-sel .ph-group{opacity:var(--app-sel)}
+.f-glass .gt .panel-content,.f-glass .gt .state{opacity:var(--app-peer);transition:opacity 160ms linear}
+.f-glass .gt.is-focus .panel-content,.f-glass .gt.is-focus .state{opacity:1}
+/* App menu (hold OK): no subtitle, so the actions sit under the name. */
+.msg-line:empty~.msg-acts{top:460px}
+/* Android fork: Manrope rests at 400; the focused item steps up to 600. */
+.font-manrope *{font-weight:400!important}
+.font-manrope .is-focus,.font-manrope .is-focus *,.font-manrope .is-lifted,.font-manrope .is-lifted *,.font-manrope .util-focus-label.is-on,.font-manrope .app-focus-name{font-weight:600!important}
+.font-manrope .monogram,.font-manrope .monogram *{font-weight:600!important}

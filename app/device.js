@@ -26,6 +26,7 @@
   function art(done) { call('screensaver', undefined, done); }
   function home(done) { call('stockHome', undefined, done); }
   function settings(done) { call('settings', undefined, done); }
+  function appInfo(id, done) { call('appInfo', id, done); }
   function apps(done) {
     if (!api()) { unavailable(done); return; }
     setTimeout(function () {
@@ -40,5 +41,5 @@
   function clock24() {
     try { return !!(api() && api().is24Hour()); } catch (e) { return false; }
   }
-  window.FrameDevice = { native: !!api(), launchApp: launchApp, art: art, home: home, settings: settings, apps: apps, clock24: clock24 };
+  window.FrameDevice = { native: !!api(), launchApp: launchApp, art: art, home: home, settings: settings, appInfo: appInfo, apps: apps, clock24: clock24 };
 }());
